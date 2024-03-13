@@ -7,27 +7,45 @@ const port = 3000;
 
 app.use(bodyParser.json());
 
+// Store connected clients
+const clients = new Set();
+
+// Handle GET requests to '/'
+app.get('/', (req, res) => {
+    res.json({ message: 'Hello from webhook handler!' });
+});
+
+// Handle POST requests to '/'
 app.post('/', (req, res) => {
     const webhookData = req.body;
     console.log('Received webhook data:', webhookData);
-    // Process the webhook data here
-    res.redirect('/webhook-handler'); // Respond to the webhook request
+    
+    // Send the received data to all connected clients
+    clients.forEach(client => {
+        client.write(`data: ${JSON.stringify(webhookData)}\n\n`);
+    });
+
+    res.sendStatus(200);
 });
 
-app.get('/webhook-handler', (req, res) => {
-    res.json({ message: 'Hello from webhook handler!' });
-});
-app.post('/webhook-handler', (req, res) => {
-    const webhookData = req.body;
-    res.json(webhookData);
+// Handle GET requests to '/events'
+app.get('/events', (req, res) => {
+    // Set headers for Server-Sent Events
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
-    console.log('Received webhook data:', webhookData);
-    // Process the webhook data here
+    // Store the client connection
+    clients.add(res);
+
+    // Handle client disconnection
+    req.on('close', () => {
+        clients.delete(res);
+    });
 });
 
 const server = http.createServer(app);
 
 server.listen(port, () => {
-    // console.log(`Webhook handler listening at https://localhost:${port}`);
-    console.log(`Webhook handler listening at https://2d03-2402-3a80-e7a-2925-2510-db70-f432-be7d.ngrok-free.app/webhook-handler`);
+    console.log(`Webhook handler listening at http://localhost:${port}`);
 });
