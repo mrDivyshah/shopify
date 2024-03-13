@@ -2,11 +2,11 @@
   "name": "shopify",
   "version": "1.0.0",
   "description": "jut a demo",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "build" : "nodemon app.js"
+    "start": "nodemon index.js",
+    "build" : "nodemon index.js"
   },
   "author": "",
   "license": "ISC",

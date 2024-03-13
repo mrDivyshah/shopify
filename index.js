@@ -14,12 +14,15 @@ app.post('/', (req, res) => {
     res.redirect('/webhook-handler'); // Respond to the webhook request
 });
 
-
+app.get('/webhook-handler', (req, res) => {
+    res.json({ message: 'Hello from webhook handler!' });
+});
 app.post('/webhook-handler', (req, res) => {
     const webhookData = req.body;
+    res.json(webhookData);
+
     console.log('Received webhook data:', webhookData);
     // Process the webhook data here
-    res.sendStatus(200); // Respond to the webhook request
 });
 
 const server = http.createServer(app);
